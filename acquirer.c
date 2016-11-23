@@ -8,9 +8,9 @@
 #include <unistd.h>
 #include <string.h>
 
-#define BUFFSIZE 512
+#define BUFFSIZE 65535
 
-#define PORT 8080
+#define PORT 50040
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -25,17 +25,18 @@ int main(int argc, char* argv[])
 	int n;
 	int len;
 	int res=0;
+	int client_s;
 	char buf[BUFFSIZE];
 
 	len=sizeof(struct sockaddr_in);
 
-	printf("Creating socket...\n");
+	printf("Creating socket listening...\n");
 	s = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	if (s == -1){
 		perror("Errore creazione socket!");
 		exit(EXIT_FAILURE);
 	}
-	printf("Socket created...\n");
+	printf("Listening socket created...\n");
 	
 
 	//port=atoi(arvg[1]);
@@ -46,10 +47,10 @@ int main(int argc, char* argv[])
 	
 
 	self.sin_family=AF_INET;
-	self.sin_port=PORT;
-	self.sin_addr.s_addr= htonl(INADDR_ANY);
+	self.sin_port=htons(PORT);
+	self.sin_addr.s_addr= inet_addr("0.0.0.0"); //htonl("127.0.0.1");
 
-	printf("Binding to port %d...",PORT);
+	printf("Binding to port %d...\n",PORT);
 
 	res = bind(s,&self,sizeof(self));
 	if (res==-1){
@@ -57,16 +58,40 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 	printf("Listening to %d...",PORT);
+	fflush(stdout);
 
+	///// SOCKET PER REINVIARE I PACCHETTI
+
+	printf("Creating serving socket...");
+	client_s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (client_s == -1){
+		perror("Errore creazione socket!");
+		exit(EXIT_FAILURE);
+	}
+	printf("Serving socket created...");
+	memset((char *) &other, 0, sizeof(struct sockaddr_in));
+
+	other.sin_family=AF_INET;
+	other.sin_port=htons(50041); //poi la porta sarà la stessa di ricezione, diversa solo per provare su stesso pc
+	other.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	//// 
 
 	while(1){
-		n=recvfrom(s,buf,BUFFSIZE,0,(struct sockaddr_in *) &other,&len);
+		bzero(buf, sizeof(buf));
+		n=recv(s,buf,BUFFSIZE,0);//,(struct sockaddr_in *) &other,&len);
 		if (n==-1){
 			perror("Errore recvfrom");
 			exit(EXIT_FAILURE);
 		}
-		printf("\nReceived data:");
-		write(1,buf,n);
+		printf("\nReceived data:%d",n);
+		//printf("sending data...");
+		fflush(stdout);
+		sendto(client_s, buf, BUFFSIZE, 0, &other, len);
+
+
+
+
 	}
 
 	return 0;
