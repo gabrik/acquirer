@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define BUFFSIZE 65535
+#define BUFFSIZE 65507
 
 #define PORT 50040
 
@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 	int len;
 	int res=0;
 	int client_s;
+	int send_res=0;
 	char buf[BUFFSIZE];
 
 	len=sizeof(struct sockaddr_in);
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
 
 	self.sin_family=AF_INET;
 	self.sin_port=htons(PORT);
-	self.sin_addr.s_addr= inet_addr("0.0.0.0"); //htonl("127.0.0.1");
+	self.sin_addr.s_addr= inet_addr("127.0.0.1"); //htonl("127.0.0.1");
 
 	printf("Binding to port %d...\n",PORT);
 
@@ -57,18 +58,18 @@ int main(int argc, char* argv[])
 		perror("Errore bind socket");
 		exit(EXIT_FAILURE);
 	}
-	printf("Listening to %d...",PORT);
-	fflush(stdout);
+	printf("Listening to %d...\n",PORT);
+	//fflush(stdout);
 
 	///// SOCKET PER REINVIARE I PACCHETTI
 
-	printf("Creating serving socket...");
+	printf("Creating serving socket...\n");
 	client_s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (client_s == -1){
 		perror("Errore creazione socket!");
 		exit(EXIT_FAILURE);
 	}
-	printf("Serving socket created...");
+	printf("Serving socket created...\n");
 	memset((char *) &other, 0, sizeof(struct sockaddr_in));
 
 	other.sin_family=AF_INET;
@@ -84,10 +85,15 @@ int main(int argc, char* argv[])
 			perror("Errore recvfrom");
 			exit(EXIT_FAILURE);
 		}
-		printf("\nReceived data:%d",n);
+		//printf("Received data:%d\n",n);
 		//printf("sending data...");
-		fflush(stdout);
-		sendto(client_s, buf, BUFFSIZE, 0, &other, len);
+		//fflush(stdout);
+		send_res=sendto(client_s, buf, n, 0, &other, len);
+		if(send_res<0){
+			perror("Error on sendto");
+		} else {
+			//printf("Sended &d data\n",send_res);
+		}
 
 
 
