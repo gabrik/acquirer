@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-m64 -Wall -O3 -g0
+CFLAGS=-m64 -O3 -g0
 BIN=acquirer
 
 x86_64 :  acquirer.c  
