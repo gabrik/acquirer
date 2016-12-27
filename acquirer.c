@@ -15,6 +15,8 @@
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
+//build unikernel unik build --name acImage --path ./ --base rump --language c --provider qemu
+
 
 int main(int argc, char* argv[])
 {
