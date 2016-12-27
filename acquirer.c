@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
 	self.sin_family=AF_INET;
 	self.sin_port=htons(PORT);
-	self.sin_addr.s_addr= inet_addr("127.0.0.1"); //htonl("127.0.0.1");
+	self.sin_addr.s_addr= inet_addr(INADDR_ANY);
 
 	printf("Binding to port %d...\n",PORT);
 
@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
 	memset((char *) &other, 0, sizeof(struct sockaddr_in));
 
 	other.sin_family=AF_INET;
-	other.sin_port=htons(50041); //poi la porta sarà la stessa di ricezione, diversa solo per provare su stesso pc
-	other.sin_addr.s_addr = inet_addr("127.0.0.1");
+	other.sin_port=htons(PORT); //poi la porta sarà la stessa di ricezione, diversa solo per provare su stesso pc
+	other.sin_addr.s_addr = inet_addr("192.168.2.60");
 
 	//// 
 
