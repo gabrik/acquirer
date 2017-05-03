@@ -32,4 +32,16 @@ To run simply use
 user@unix:~/acquirer$ ./acquirer
 ```
 
-This code as the possibility to be build as a unikernel, by using [Unik](https://github.com/emc-advanced-dev/unik)
+To build as unikernel
+
+```
+user@unix:~/acquirer$ make unikernel
+```
+
+Then you can edit vm.sh file for use the correct bridge interface, and start a vm by typing
+
+```
+user@unix:~/acquirer$ sudo ./vm.sh
+```
+
+This code as the possibility to be build as a unikernel, by using [rumprun](https://github.com/rumpkernel/rumprun)
