@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/acquirer",
-            "args": [],
+            "args": ["127.0.0.1","50040","-d"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

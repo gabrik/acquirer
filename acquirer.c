@@ -10,9 +10,6 @@
 
 #define BUFFSIZE 65507
 
-#define PORT 50040
-#define DESTINATION "192.168.2.60"
-
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
@@ -30,6 +27,33 @@ int main(int argc, char* argv[])
 	int client_s;
 	int send_res=0;
 	char buf[BUFFSIZE];
+	char* ip_dst;
+	int port;
+
+	int debug=0;
+
+	if(argc<3){
+		printf("[Usage] %s <fake destination> <udp port> -d (optional for debug)\n",argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	ip_dst=argv[1];
+	port=atoi(argv[2]);
+
+	if(argc==4 && strcmp(argv[3],"-d")==0){
+		debug=1;
+		printf("DEBUG MODE\n\n");
+	}
+		
+
+
+	printf("###### Configuration ########\n");
+	printf("# Destination: %s\n",ip_dst);
+	printf("# Port: %d\n",port);
+	printf("#############################\n\n");
+	
+
+
 
 	len=sizeof(struct sockaddr_in);
 
@@ -44,26 +68,26 @@ int main(int argc, char* argv[])
 
 	//port=atoi(arvg[1]);
 
-	//inizializzo la memoria
+	//INPUT SOCKET
 	bzero((char *) &self, sizeof(self));
 
 	
 
 	self.sin_family=AF_INET;
-	self.sin_port=htons(PORT);
+	self.sin_port=htons(port);
 	self.sin_addr.s_addr= htonl(INADDR_ANY);
 
-	printf("Binding to port %d...\n",PORT);
+	printf("Binding to port %d...\n",port);
 
 	res = bind(s,&self,sizeof(self));
 	if (res==-1){
 		perror("Errore bind socket");
 		exit(EXIT_FAILURE);
 	}
-	printf("Listening to %d...\n",PORT);
-	//fflush(stdout);
+	printf("Listening to %d...\n",port);
 
-	///// SOCKET PER REINVIARE I PACCHETTI
+
+	///// SEND SOCKET
 
 	printf("Creating serving socket...\n");
 	client_s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -75,26 +99,30 @@ int main(int argc, char* argv[])
 	bzero((char *) &other, sizeof(other));
 
 	other.sin_family=AF_INET;
-	other.sin_port=htons(PORT); //poi la porta sarà la stessa di ricezione, diversa solo per provare su stesso pc
-	other.sin_addr.s_addr = inet_addr(DESTINATION);
+	other.sin_port=htons(port); 
+	other.sin_addr.s_addr = inet_addr(ip_dst);
 
 	//// 
 
 	while(1){
 		bzero(buf, sizeof(buf));
-		n=recv(s,buf,BUFFSIZE,0);//,(struct sockaddr_in *) &other,&len);
+		n=recv(s,buf,BUFFSIZE,0);
 		if (n==-1){
-			perror("Errore recvfrom");
+			perror("Error recvfrom");
 			exit(EXIT_FAILURE);
 		}
-		printf("Received data:%d\n",n);
-		printf("sending data...\n");
-		fflush(stdout);
+		if(debug){
+			printf("Received data:%d\n",n);
+			printf("sending data...\n");
+			fflush(stdout);
+		}
+		
 		send_res=sendto(client_s, buf, n, 0, &other, len);
 		if(send_res<0){
 			perror("Error on sendto");
 		} else {
-			//printf("Sended &d data\n",send_res);
+			if(debug)
+				printf("Sended %d data\n",send_res);
 		}
 
 

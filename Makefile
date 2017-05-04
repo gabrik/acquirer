@@ -2,6 +2,8 @@ CC=gcc
 CFLAGS=-m64 -O3 -g0
 BIN=acquirer
 
+DCFLAGS = -ggdb
+
 #for unikernel
 RUMPCC=x86_64-rumprun-netbsd-gcc
 RUMPBAKE=rumprun-bake
@@ -12,10 +14,12 @@ RUMPBIN=acquirer-rump
 x86_64 :  acquirer.c  
 	${CC} acquirer.c  ${CFLAGS} -o ${BIN} 
 
+debug:  acquirer.c  
+	${CC} acquirer.c  ${DCFLAGS} -o ${BIN} 
+
 unikernel: acquirer.c
 	${RUMPCC} acquirer.c -o ${RUMPBIN}
 	${RUMPBAKE} ${BAKEFLAGS} ${KERNEL_FILE} ${RUMPBIN}
-
 
 clean :
 	rm -rf acquirer

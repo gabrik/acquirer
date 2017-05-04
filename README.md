@@ -29,7 +29,7 @@ This will create a file named **acquirer** inside the repo directory.
 To run simply use
 
 ```
-user@unix:~/acquirer$ ./acquirer
+user@unix:~/acquirer$ ./acquirer <fake destination> <udp port> -d (optional for debug)
 ```
 
 To build as unikernel
@@ -38,7 +38,7 @@ To build as unikernel
 user@unix:~/acquirer$ make unikernel
 ```
 
-Then you can edit vm.sh file for use the correct bridge interface, and start a vm by typing
+Then you can edit vm.sh file for use the correct bridge interface, and the arguments, then you can start a unikernel by typing
 
 ```
 user@unix:~/acquirer$ sudo ./vm.sh
